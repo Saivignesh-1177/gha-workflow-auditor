@@ -1,0 +1,27 @@
+name: ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # upload SARIF to code scanning
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m unittest -v
+      - name: Dogfood. Audit this repo's own workflows
+        run: python -m ghaudit .github/workflows --fail-on high --sarif ghaudit.sarif
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always() && github.event_name == 'push'
+        with:
+          sarif_file: ghaudit.sarif

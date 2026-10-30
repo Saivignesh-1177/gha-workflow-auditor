@@ -1,0 +1,24 @@
+# The same workflow after remediation. ghaudit reports zero findings for it.
+name: triage
+on:
+  pull_request:
+  issues:
+    types: [opened]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Greet
+        env:
+          TITLE: ${{ github.event.issue.title }}
+        run: echo "Thanks for '$TITLE'"
+      - name: Install tool (pinned + verified)
+        run: |
+          curl -sSLo install.sh https://example.com/install.sh
+          echo "<expected-sha256>  install.sh" | sha256sum -c -
+          bash install.sh

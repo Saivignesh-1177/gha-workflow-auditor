@@ -1,0 +1,20 @@
+# DELIBERATELY VULNERABLE. This is a teaching example for ghaudit and is never executed (it lives outside .github/).
+name: triage
+on:
+  pull_request_target:
+  issues:
+    types: [opened]
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: tj-actions/changed-files@v45
+      - name: Greet
+        run: echo "Thanks for '${{ github.event.issue.title }}'"
+      - name: Install tool
+        run: curl -sSL https://example.com/install.sh | bash
+      - name: Debug
+        run: echo ${{ secrets.DEPLOY_TOKEN }} > token.txt
